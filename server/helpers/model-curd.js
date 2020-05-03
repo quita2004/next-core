@@ -1,60 +1,46 @@
 module.exports = ({
-  knex = {},
-  name = 'name',
+  knex,
   tableName = 'tableName',
   selectableProps = '*'
 }) => {
-  const create = props => {
+  const create = async props => {
     return knex.insert(props)
       .returning(selectableProps)
       .into(tableName);
   };
 
-  const addFilter = (query, filter) => {
-    if (filter.sql && filter.params) {
-      return query.whereRaw(filter.sql, filters.params);
-    }
-
-    if (filter && typeof filter === 'object') {
-      return query.where(filter);
-    }
-
-    return query;
-  }
-
-  const findAll = (filters) => {
-    const query = knex.select(selectableProps)
+  const findAll = async (filters = {}) => {
+    return knex.select(selectableProps)
+      .where(filters)
       .from(tableName);
-    query = addFilter(filters);
-
-    return query;
   };
 
-  const findOne = (filters) => {
-    return findAll(filters).first();
+  const findOne = async (filters) => {
+    return knex.select(selectableProps)
+    .where(filters)
+    .from(tableName).first();
   };
 
-  const update = (props, filters) => {
-    const query = knex.update(props).from(tableName);
-    query = addFilter(query, filters);
-    return query.returning(selectableProps);
+  const update = async (props, filters) => {
+    return knex.update(props).from(tableName)
+      .where(filters)
+      .returning(selectableProps);
   };
 
-  const remove = filters => {
-    const query = knex.del().from(tableName);
-    query = addFilter(query, filters);
-    return query.returning(selectableProps);
+  const remove = async filters => {
+    return knex.del().from(tableName)
+      .where(filters)
+      .returning(selectableProps);
   };
 
   return {
-    knex,
-    name,
-    tableName,
-    selectableProps,
     create,
     findAll,
     findOne,
     update,
-    remove
+    remove,
+    knex,
+    tableName,
+    selectableProps
   };
 }

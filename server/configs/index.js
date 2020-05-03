@@ -6,6 +6,8 @@ module.exports = {
       user: 'postgres',
       password: '0402',
       database: 'postgres'
-    }
-  }
+    },
+    schema: 'core'
+  },
+  jwtSecret: 'LDALJDOIUR7342'
 }
